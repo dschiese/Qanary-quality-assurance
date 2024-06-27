@@ -1,0 +1,127 @@
+version: '3.8'
+services:
+  pipeline-1:
+    image: qanary/qanary-pipeline:latest
+    depends_on:
+      - virtuoso-1
+    ports:
+      - 8080:8080
+    environment:
+      - SERVER_PORT=8080
+      - SERVER_HOST=http://141.57.63.116
+      - SPRING_APPLICATION_NAME=MyQanaryPipeline
+      - QANARY_COMPONENTS=NED-DBpediaSpotlight,MyQanaryPipeline1,MyQanaryPipeline2
+      - VIRTUOSO_URL=jdbc:virtuoso://virtuoso-1:1111
+      - VIRTUOSO_USERNAME=dba
+      - VIRTUOSO_PASSWORD=dba
+      - PIPELINE_AS_COMPONENT=false
+
+  pipeline-2:
+    image: qanary/qanary-pipeline:latest
+    depends_on:
+      - virtuoso-1
+    ports:
+      - 8081:8081
+    environment:
+      - SERVER_PORT=8081
+      - SERVER_HOST=http://141.57.63.116
+      - SPRING_APPLICATION_NAME=MyQanaryPipeline1
+      - QANARY_COMPONENTS=QB-BirthDataWikidata
+      - VIRTUOSO_URL=jdbc:virtuoso://virtuoso-1:1111
+      - VIRTUOSO_USERNAME=dba
+      - VIRTUOSO_PASSWORD=dba
+      - PIPELINE_AS_COMPONENT=true
+      - SPRING_BOOT_ADMIN_URL=http://141.57.63.116:8080
+      - SPRING_BOOT_ADMIN_CLIENT_URL=http://141.57.63.116:8080
+
+  pipeline-3:
+    image: qanary/qanary-pipeline:latest
+    depends_on:
+      - virtuoso-1
+    ports:
+      - 8082:8082
+    environment:
+      - SERVER_PORT=8082
+      - SERVER_HOST=http://141.57.63.116
+      - SPRING_APPLICATION_NAME=MyQanaryPipeline2
+      - QANARY_COMPONENTS=KG2KG-TranslateAnnotationsOfInstanceToDBpediaOrWikidata,QB-BirthDataWikidata
+      - VIRTUOSO_URL=jdbc:virtuoso://virtuoso-1:1111
+      - VIRTUOSO_USERNAME=dba
+      - VIRTUOSO_PASSWORD=dba
+      - PIPELINE_AS_COMPONENT=true
+      - SPRING_BOOT_ADMIN_URL=http://141.57.63.116:8080
+      - SPRING_BOOT_ADMIN_CLIENT_URL=http://141.57.63.116:8080
+
+  virtuoso-1:
+    image: openlink/virtuoso-opensource-7
+    ports:
+      - 1111:1111
+      - 8890:8890
+    environment:
+      - DBA_PASSWORD=dba
+
+  kg2kg:
+    depends_on:
+      - pipeline-2
+    image: qanary/qanary-component-kg2kg-translateannotationsofinstance
+    ports:
+      - 40444:40444
+    environment:
+      - SPRING_BOOT_ADMIN_URL=http://141.57.63.116:8082
+      - SPRING_BOOT_ADMIN_CLIENT_SERVICE-BASE-URL=http://141.57.63.116:40444
+      - SPRING_BOOT_ADMIN_CLIENT_INSTANCE_SERVICE_BASE_URL=http://141.57.63.116:40444
+      - SERVER_HOST=http://141.57.63.116
+      - SERVER_PORT=40444
+
+  ned-DBpediaSpotlight:
+    depends_on:
+      - pipeline-1
+    image: qanary/qanary-component-ned-dbpediaspotlight
+    ports: 
+      - 10008:10008
+    environment:
+      - SPRING_BOOT_ADMIN_URL=http://141.57.63.116:8080
+      - SPRING_BOOT_ADMIN_CLIENT_SERVICE-BASE-URL=http://141.57.63.116:10008
+      - SPRING_BOOT_ADMIN_CLIENT_INSTANCE_SERVICE_BASE_URL=http://141.57.63.116:10008
+      - SERVER_HOST=http://141.57.63.116
+      - SERVER_PORT=10008
+
+  qb-BirthDataWikidata:
+    depends_on:
+      - pipeline-2
+    image: qanary/qanary-component-qb-birthdata-wikidata
+    ports:
+      - 5555:5555
+    environment:
+      - SPRING_BOOT_ADMIN_URL=http://141.57.63.116:8081
+      - SPRING_BOOT_ADMIN_CLIENT_SERVICE-BASE-URL=http://141.57.63.116:5555
+      - SPRING_BOOT_ADMIN_CLIENT_INSTANCE_SERVICE_BASE_URL=http://141.57.63.116:5555
+      - SERVER_HOST=http://141.57.63.116
+      - SERVER_PORT=5555
+
+  qb-BirthDataWikidata2:
+    depends_on:
+      - pipeline-3
+    image: qanary/qanary-component-qb-birthdata-wikidata
+    ports:
+      - 5556:5556
+    environment:
+      - SPRING_BOOT_ADMIN_URL=http://141.57.63.116:8082
+      - SPRING_BOOT_ADMIN_CLIENT_SERVICE-BASE-URL=http://141.57.63.116:5556
+      - SPRING_BOOT_ADMIN_CLIENT_INSTANCE_SERVICE_BASE_URL=http://141.57.63.116:5556
+      - SERVER_HOST=http://141.57.63.116
+      - SERVER_PORT=5556
+
+  qe-WikidataQueryExecuter:
+    depends_on:
+      - pipeline-3
+    image: qanary/qanary-component-qe-wikidata
+    ports:
+      - 5557:5557
+    environment:
+      - SPRING_BOOT_ADMIN_URL=http://141.57.63.116:8082
+      - SPRING_BOOT_ADMIN_CLIENT_SERVICE-BASE-URL=http://141.57.63.116:5557
+      - SPRING_BOOT_ADMIN_CLIENT_INSTANCE_SERVICE_BASE_URL=http://141.57.63.116:5557
+      - SERVER_HOST=http://141.57.63.116
+      - SERVER_PORT=5557
+  

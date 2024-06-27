@@ -1,0 +1,37 @@
+{
+    "qanary": {
+        "system_url": "http://141.57.63.116:8080/startquestionansweringwithtextquestion",
+        "componentlist": [
+            "NED-DBpediaSpotlight",
+            "MyQanaryPipeline1",
+            "MyQanaryPipeline2"
+        ]
+    },
+    "validation-sparql-templates": [
+        "0_was_any_instance_identified.sparql",
+        "1_no_annotationanswersparql_pipeline2.sparql",
+        "2_was_any_instance_identified_by_pipeline3.sparql",
+        "3_was_any_annotationanswersparql_identified_by_pipeline3.sparql"
+    ],
+    "tests": 
+    [
+        {
+            "question": "When was Angela Merkel born?",
+            "replacements": {
+                
+            }
+        },
+        {
+            "question": "When was Stephen Hawking born?",
+            "replacements":{
+
+            }
+        },
+        {
+            "question": "When and where was Albert Einstein born?",
+            "replacements": {
+
+            }
+        }
+   ]
+}
