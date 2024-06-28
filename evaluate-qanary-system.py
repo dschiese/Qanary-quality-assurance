@@ -43,20 +43,21 @@ def connect_to_triplestore(conf_qanary, endpoint):
         return None
 
 
-def prepare_sparql_query(logger, sparql_template_filename, replacements, graphid):
+def prepare_sparql_query(logger, sparql_template_filename, replacements, graphid, question_uri):
     # pprint.pprint(replacements)
     with open(sparql_template_filename, 'r') as file:
         data = file.read()
 
         if "<GRAPHID>" not in data:
-            raise RuntimeError("The file '%s' does NOT contain the placeholder '<GRAPHID>'." % (
+        #    raise RuntimeError("The file '%s' does NOT contain the placeholder '<GRAPHID>'." % (
+            logger.warning("The file '%s' does NOT contain the placeholder '<GRAPHID>'." % (
                 sparql_template_filename,))
 
         if "ASK" not in data.upper():
             raise RuntimeError("The file '%s' seems NOT to be a ASK query (the string 'ASK' is not contained in the file)." % (
                 sparql_template_filename,))
 
-        data = data.replace("<GRAPHID>", f"<{graphid}>")
+        data = data.replace("<GRAPHID>", f"<{graphid}>").replace("<QUESTION_URI>", f"<{question_uri}>")
 
         for k in replacements.keys():
             # pprint.pprint(replacement.keys())
@@ -97,12 +98,12 @@ def request_qanary_endpoint_for_question(logger, conf_qanary, question):
     return my_response.json()
 
 
-def sparql_execute_query(logger, question, configuration_directory, sparql_template_filename, connection, graphid):
+def sparql_execute_query(logger, question, configuration_directory, sparql_template_filename, connection, graphid, question_uri):
     logger.warning(f"using question: {question}")
     logger.warning(f"using graph id: {graphid}")
     replacements = question.get("replacements")
     sparql_query_complete = prepare_sparql_query(
-        logger, configuration_directory + "/" + sparql_template_filename, replacements, graphid)
+        logger, configuration_directory + "/" + sparql_template_filename, replacements, graphid, question_uri)
     logger.info(sparql_query_complete)
     try:
         logging.debug(sparql_query_complete)
@@ -150,13 +151,14 @@ def evaluate_tests(logger, conf_qanary, configuration_directory, validation_spar
 
         graphid = qanary_response.get("outGraph")
         endpoint = qanary_response.get("endpoint")
+        question_uri = qanary_response.get("question")
         connection = connect_to_triplestore(conf_qanary, endpoint)
 
         result_per_test = []
         for validation_sparql_template in validation_sparql_templates:
             start = datetime.datetime.now()
             result = evaluate_test(logger, conf_qanary, configuration_directory,
-                                   test, validation_sparql_template, connection, graphid)
+                                   test, validation_sparql_template, connection, graphid, question_uri)
             milliseconds = measure_duration_in_milliseconds(start)
 
             print(" ... %s (%d ms)" % (result, milliseconds), end='')
@@ -190,7 +192,7 @@ def evaluate_tests(logger, conf_qanary, configuration_directory, validation_spar
     return results
 
 
-def evaluate_test(logger, conf_qanary, configuration_directory, test, validation_sparql_template, connection, graphid):
+def evaluate_test(logger, conf_qanary, configuration_directory, test, validation_sparql_template, connection, graphid, question_uri):
     """
     evaluate one specific SPARQL tests on pre-runned Qanary process
 
@@ -205,7 +207,7 @@ def evaluate_test(logger, conf_qanary, configuration_directory, test, validation
         [type]: [description]
     """
     result = sparql_execute_query(
-        logger, test, configuration_directory, validation_sparql_template, connection, graphid)
+        logger, test, configuration_directory, validation_sparql_template, connection, graphid, question_uri)
     result = result.get("boolean")
     logger.info("question: %s, result: %s, sparql: %s" %
                 (test.get("question"), result, validation_sparql_template))
@@ -387,7 +389,7 @@ def export_to_excel(logger, test_results, filename_prefix, sheet_name):
     worksheet.write(number_of_questions+1, 0, "average:", avg_format)
 
     # Close the Pandas Excel writer and output the Excel file.
-    writer.save()
+    writer._save()
     print("EXCEL file written to '%s'." % (xlsx_filename,))
 
 
