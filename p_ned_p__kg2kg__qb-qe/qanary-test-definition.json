@@ -7,9 +7,13 @@
         ]
     },
     "validation-sparql-templates": [
-        "0_was_any_instance_identified_by_pipeline2.sparql",
-        "1_was_any_annotationanswersparql_indentified_by_pipeline2.sparql",
-        "2_was_any_annotationanswerjson_identified_by_pipeline1.sparql"
+        "0_are_three_graphs_present.sparql",
+        "1_at_least_one_annotationofinstance_ned.sparql",
+        "2_at_least_one_annotationofinstance_kg2kg.sparql",
+        "3_at_least_one_annotationofanswersparql_qb.sparql",
+        "4_at_least_one_annotationofanswerjson.sparql",
+        "5_at_least_two_annotationofinstance_pipeline2.sparql",
+        "6_at_least_one_annotationofanswersparql_pipeline2.sparql"        
     ],
     "tests": 
     [
@@ -26,7 +30,7 @@
             }
         },
         {
-            "question": "When and where was Albert Einstein born?",
+            "question": "When and where was Rick Astley born?",
             "replacements": {
 
             }
