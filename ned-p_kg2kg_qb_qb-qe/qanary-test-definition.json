@@ -11,7 +11,9 @@
         "0_was-any-instance-identified.sparql",
         "1_was_any_instance_of_pipeline2_identified.sparql",
         "2_was_any_answersparql_of_pipeline2_identified.sparql",
-        "3_was_any_answerjson_identified.sparql"
+        "3_was_any_answerjson_identified.sparql",
+        "4_subpipeline_annotations.sparql",
+        "5_exist_exactly_two_graphs.sparql"
     ],
     "tests": 
     [
@@ -28,7 +30,7 @@
             }
         },
         {
-            "question": "When and where was Albert Einstein born?",
+            "question": "When and where was Rick Astley born?",
             "replacements": {
 
             }

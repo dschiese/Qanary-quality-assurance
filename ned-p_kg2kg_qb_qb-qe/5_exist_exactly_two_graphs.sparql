@@ -6,9 +6,12 @@ ASK
 FROM <GRAPHID>
 WHERE {
   {
-    SELECT (COUNT(?g) AS ?graphs) 
+    SELECT (COUNT(DISTINCT ?g) AS ?graphs)
     WHERE {
-        GRAPH ?g { ?s ?p ?o } #Define prefix for graph
+        GRAPH ?g { 
+          ?s ?p ?o ;
+              oa:hasTarget <QUESTION_URI> .
+        } FILTER(STRSTARTS(STR(?g), "urn:graph"))
     }   
   } FILTER(?graphs = 2)
 }

@@ -8,12 +8,13 @@ WHERE {
   {
     SELECT (COUNT(?annotationId) AS ?annotations)
     WHERE {
-      ?annotationId rdf:type qa:AnnotationOfAnswerJSON.
+      ?annotationId rdf:type ?type.
       ?annotationId oa:hasBody ?body.
       ?annotationId oa:hasTarget ?target.
       ?annotationId oa:annotatedAt ?date.
       ?annotationId oa:annotatedBy ?component.
+      FILTER(?type = qa:AnnotationOfAnswerJSON || ?type = qa:AnnotationOfAnswerJson)
     }
   }
-  FILTER(?annotations > 1)
+  FILTER(?annotations > 0)
 }

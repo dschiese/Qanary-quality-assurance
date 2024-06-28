@@ -15,5 +15,5 @@ WHERE {
       ?annotationId oa:annotatedBy <urn:qanary:MyQanaryPipeline1> .
     }
   }
-  FILTER(?annotations > 1)
+  FILTER(?annotations > 0)
 }

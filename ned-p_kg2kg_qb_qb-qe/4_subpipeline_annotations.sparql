@@ -7,8 +7,8 @@ FROM <GRAPHID>
 WHERE
 {
     GRAPH ?graphid {
-        ?annotation oa:annotatedBy ?qbComponent
-        ?annotation rdf:type qa:AnnotationOfAnswerSPARQL
+        ?annotation oa:annotatedBy ?component .
+        ?annotation rdf:type qa:AnnotationOfAnswerSPARQL .
+    FILTER(?component = <urn:qanary:QB-BirthDataWikidata> || ?component = <urn:qanary:QAnswerQueryBuilderAndQueryCandidateFetcher>)
     }
-    FILTER(?qbComponent = "urn:qanary:QB-BirthDataWikidata" || ?qbComponent = "QAnswerQueryBuilderAndQueryCandidateFetcher")
 }
