@@ -12,8 +12,8 @@ WHERE {
       ?annotationId oa:hasBody ?body.
       ?annotationId oa:hasTarget ?target.
       ?annotationId oa:annotatedAt ?date.
-      ?annotationId oa:annotatedBy ?component.
+      ?annotationId oa:annotatedBy <urn:qanary:NED-DBpediaSpotlight>.
     }
   }
-  FILTER(?annotations > 1)
+  FILTER(?annotations > 0)
 }
